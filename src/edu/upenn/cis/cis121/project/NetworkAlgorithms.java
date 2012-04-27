@@ -88,10 +88,10 @@ public class NetworkAlgorithms {
 		HashSet<Integer> places2 = fromPrim(dbw.getLikes(user2));
 		
 		HashSet<Integer> common_places = new HashSet<Integer>();
-		HashSet<Integer> common_place_types = new HashSet<Integer>();
 		
-		HashSet<Integer> place_types_1 = new HashSet<Integer>();
-		HashSet<Integer> place_types_2 = new HashSet<Integer>();
+		ArrayList<Integer> place_types_1 = new ArrayList<Integer>();
+		ArrayList<Integer> place_types_2 = new ArrayList<Integer>();
+		int common_place_type_count =0;
 		
 		for(Integer place : places1)
 		{
@@ -106,18 +106,19 @@ public class NetworkAlgorithms {
 		
 		for(Integer place_type : place_types_1)
 		{
-			if(place_types_2.contains(place_type)) 
-				common_place_types.add(place_type);
+			if(place_types_2.contains(place_type))
+			{
+				common_place_type_count++;
+				place_types_2.remove(place_type);
+			}
 		}
 		
 		int common_place_count = common_places.size();
-		int common_place_type_count = common_place_types.size();
 		
 		double weight = 1 / ((double) common_place_count + 
 				0.1 * (double) common_place_type_count + 0.01);
 		
 		return weight;
-		
 
 	}
 	
