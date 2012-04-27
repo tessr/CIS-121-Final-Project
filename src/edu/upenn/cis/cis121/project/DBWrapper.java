@@ -114,6 +114,38 @@ public class DBWrapper {
 		return loc;
 	}
 	
+	public boolean userExists(int user_id)
+	{
+		try {
+			String query = "select count(user_id) from Users where user_id="
+					+ user_id;
+			
+			Statement st = _conn.createStatement();
+		    ResultSet rs = st.executeQuery(query);
+		    
+		    while (rs.next()) {
+		    	int res = rs.getInt(1);
+			    if(res == 1)
+			    {
+			    	return true;
+			    }
+			    else
+			    {
+			    	return false;
+			    }
+		    }
+
+		    rs.close();
+		    st.close();
+		} catch (SQLException sqle) {
+			System.err.println(sqle.toString());
+			return false;
+		}
+		
+		return false;
+		
+	}
+	
 	/**
 	 * Converts an ArrayList of Integers to an array of ints.
 	 * @param list ArrayList of Integers
