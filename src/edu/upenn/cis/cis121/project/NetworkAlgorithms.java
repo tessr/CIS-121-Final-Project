@@ -2,6 +2,7 @@ package edu.upenn.cis.cis121.project;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -75,4 +76,60 @@ public class NetworkAlgorithms {
 		
 	}
 
+	public List<Integer> recommendFriends(int user_id, int numRec)
+			throws IllegalArgumentException
+	{
+		return null;
+	}
+	
+	private double weight(int user1, int user2)
+	{
+		HashSet<Integer> places1 = fromPrim(dbw.getLikes(user1));
+		HashSet<Integer> places2 = fromPrim(dbw.getLikes(user2));
+		
+		HashSet<Integer> common_places = new HashSet<Integer>();
+		HashSet<Integer> common_place_types = new HashSet<Integer>();
+		
+		HashSet<Integer> place_types_1 = new HashSet<Integer>();
+		HashSet<Integer> place_types_2 = new HashSet<Integer>();
+		
+		for(Integer place : places1)
+		{
+			place_types_1.add(dbw.getType(place.intValue()));
+			if(places2.contains(place)) common_places.add(place);
+		}
+		
+		for(Integer place: places2)
+		{
+			place_types_2.add(dbw.getType(place.intValue()));
+		}
+		
+		for(Integer place_type : place_types_1)
+		{
+			if(place_types_2.contains(place_type)) 
+				common_place_types.add(place_type);
+		}
+		
+		int common_place_count = common_places.size();
+		int common_place_type_count = common_place_types.size();
+		
+		double weight = 1 / ((double) common_place_count + 
+				0.1 * (double) common_place_type_count + 0.01);
+		
+		return weight;
+		
+
+	}
+	
+	private HashSet<Integer> fromPrim(int[] arr)
+	{
+		HashSet<Integer> set = new HashSet<Integer>();
+		for(int ii = 0; ii < arr.length; ii++)
+		{
+			set.set(ii, arr[ii]);
+		}
+		
+		return set;
+	}
+	
 }
