@@ -142,6 +142,30 @@ public class DBWrapper {
 		return loc;
 	}
 	
+	public double[] getUserLocation(int user_id)
+	{
+		double[] loc = new double[2];
+		try {
+			String query = "select latitude, longitude from Users where " +
+					"user_id = " + user_id;
+			
+			Statement st = _conn.createStatement();
+		    ResultSet rs = st.executeQuery(query);
+		    
+		    while (rs.next()) {
+		    	loc[0] = rs.getInt("latitude");
+		    	loc[1] = rs.getInt("longitude");
+		    }
+		    
+		    rs.close();
+		    st.close();
+		} catch (SQLException sqle) {
+			System.err.println(sqle.toString());
+		}
+		
+		return loc;
+	}
+	
 	public boolean userExists(int user_id)
 	{
 		try {
