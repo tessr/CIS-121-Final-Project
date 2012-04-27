@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 
 public class NetworkAlgorithms {
 	
@@ -79,6 +80,8 @@ public class NetworkAlgorithms {
 	public List<Integer> recommendFriends(int user_id, int numRec)
 			throws IllegalArgumentException
 	{
+		int counter = 0;
+		
 		return null;
 	}
 	
@@ -127,7 +130,7 @@ public class NetworkAlgorithms {
 		HashSet<Integer> set = new HashSet<Integer>();
 		for(int ii = 0; ii < arr.length; ii++)
 		{
-			set.set(ii, arr[ii]);
+			set.add(arr[ii]);
 		}
 		
 		return set;
