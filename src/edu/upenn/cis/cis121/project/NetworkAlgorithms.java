@@ -1,6 +1,7 @@
 package edu.upenn.cis.cis121.project;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -157,12 +158,12 @@ public class NetworkAlgorithms {
 		distances.put(user_id, 0.0);
 		toVisit.add(new Pair(user_id,0.0));
 		
-		while(!toVisit.isEmpty() && counter <= numRec)
+		while(!toVisit.isEmpty() && counter < numRec)
 		{
 			Pair curr = toVisit.poll();
 			visited.add(curr.user_id);
 			
-			if(dbw.isFriend(curr.user_id, user_id))
+			if(!dbw.isFriend(curr.user_id, user_id) && curr.user_id != user_id)
 			{
 				recommendations.add(curr.user_id);
 				counter++;
@@ -211,10 +212,10 @@ public class NetworkAlgorithms {
 		}
 		
 		
-		return null;
+		return recommendations;
 	}
 	
-	private double weight(int user1, int user2)
+	public double weight(int user1, int user2)
 	{
 		HashSet<Integer> places1 = fromPrim(dbw.getLikes(user1));
 		HashSet<Integer> places2 = fromPrim(dbw.getLikes(user2));
@@ -250,9 +251,12 @@ public class NetworkAlgorithms {
 		double weight = 1 / ((double) common_place_count + 
 				0.1 * (double) common_place_type_count + 0.01);
 		
-		return weight;
+		return weight; 
+	
 
 	}
+	
+
 
 	
 	private HashSet<Integer> fromPrim(int[] arr)
@@ -271,6 +275,18 @@ public class NetworkAlgorithms {
 				throws IllegalArgumentException
 	{
 		return "";
+	}
+	
+	/**
+	 * Close the database connection.
+	 * @throws SQLException
+	 */
+	public void closeDBConnection() {
+		try {
+			DBUtils.closeDBConnection();
+		} catch (SQLException sqle) {
+			sqle.printStackTrace(System.err);
+		}
 	}
 	
 }

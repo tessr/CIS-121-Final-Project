@@ -224,5 +224,17 @@ public class DBWrapper {
 		
 		return res;
 	}
+	  
+		/**
+		 * Close the database connection.
+		 * @throws SQLException
+		 */
+		public void closeDBConnection() {
+			try {
+				DBUtils.closeDBConnection();
+			} catch (SQLException sqle) {
+				sqle.printStackTrace(System.err);
+			}
+		}
 
 }
