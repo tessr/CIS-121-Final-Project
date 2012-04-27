@@ -1,7 +1,5 @@
 package edu.upenn.cis.cis121.project;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,6 +86,50 @@ public class NetworkAlgorithms {
 			{
 				return 0;
 			}
+		}
+	}
+	
+	private class Place implements Comparable<Place>
+	{
+		int place_id;
+		double distance;
+		double[] location;
+		double likes;
+		
+		public Place(int pi, double[] loc, double[] centerloc)
+		{
+			place_id = pi;
+			location = loc;
+			distance = Math.sqrt(Math.pow((loc[0] - centerloc[0]),2) + 
+					Math.pow((loc[1] - centerloc[1]),2));
+			likes = 1;
+		}
+		
+		public double getS()
+		{
+			return likes/(distance + 0.01);
+		}
+		
+		public int compareTo(Place other)
+		{
+			if (this.getS() > other.getS())
+			{
+				return 1;
+			}
+			else if (this.getS() < other.getS())
+			{
+				return -1;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		
+		public boolean equals(Object other)
+		{
+			Place that = (Place) other;
+			return (this.place_id == that.place_id);
 		}
 	}
 
@@ -274,6 +316,74 @@ public class NetworkAlgorithms {
 		(int user_id, int maxFriends, int maxPlaces) 
 				throws IllegalArgumentException
 	{
+		
+		//first, get the close friends. but before that, must have
+		//all friends.
+		PriorityQueue<Friend> all_friends = new PriorityQueue<Friend>();
+		int[] all_friends_primitive = dbw.getFriends(user_id);
+		for(int ii = 0; ii < all_friends_primitive.length; ii++)
+		{
+			int uid = all_friends_primitive[ii];
+			Friend fr = new Friend(uid,dbw.getUserLocation(uid),
+					dbw.getUserLocation(user_id));
+			all_friends.add(fr);
+		}
+		
+		int count = 0; 
+		
+		ArrayList<Friend> close_friends = new ArrayList<Friend>();
+		
+		while(count < maxFriends && !all_friends.isEmpty())
+		{
+			close_friends.add(all_friends.poll());
+		}
+		
+		//now find the center of friends
+		
+		double tot_long = 0;
+		double tot_lat = 0;
+		
+		for(int ii = 0; ii < close_friends.size(); ii++)
+		{
+			tot_lat += close_friends.get(ii).location[0];
+			tot_long += close_friends.get(ii).location[1];
+		}
+		
+		tot_lat += dbw.getUserLocation(user_id)[0];
+		tot_long += dbw.getUserLocation(user_id)[1];
+		
+		double center_lat = tot_lat/(close_friends.size() + 1);
+		double center_long = tot_long/(close_friends.size() + 1);
+		double[] center = {center_lat, center_long};
+		
+		//and get a set of all the places that people like
+		
+		PriorityQueue<Place> passable_places = new PriorityQueue<Place>();
+		
+		for(Friend ff : close_friends)
+		{
+			int[] places = dbw.getLikes(ff.user_id);
+			for(int ii = 0; ii < places.length; ii++)
+			{
+				Place curr = new Place(places[ii],
+						dbw.getLocation(places[ii]), center);
+				if (!passable_places.contains(curr))
+					{
+					passable_places.add(curr);
+					}
+				else
+				{
+					passable_places.remove(curr);
+					curr.likes++;
+					passable_places.add(curr);
+				}
+			}
+		}
+		
+		//need to update so getS is less... zero
+		
+		
+		
 		return "";
 	}
 	
