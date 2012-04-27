@@ -3,9 +3,11 @@ package edu.upenn.cis.cis121.project;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
 
 public class NetworkAlgorithms {
 	
@@ -21,6 +23,40 @@ public class NetworkAlgorithms {
 			user_id = ui;
 			depth = ll;
 		}
+	}
+	
+	private class Pair implements Comparable<Pair> {
+		int user_id;
+		double distance;
+		
+		public Pair(int ui, double dd)
+		{
+			user_id = ui;
+			distance = dd;
+		}
+		
+		public boolean equals(Object other)
+		{
+			Pair that = (Pair) other;
+			return (this.user_id == that.user_id);
+		}
+		
+		public int compareTo(Pair other)
+		{
+			if (this.distance > other.distance)
+			{
+				return 1;
+			}
+			else if (this.distance < other.distance)
+			{
+				return -1;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		
 	}
 
 
@@ -81,6 +117,24 @@ public class NetworkAlgorithms {
 			throws IllegalArgumentException
 	{
 		int counter = 0;
+		PriorityQueue<Pair> toVisit = new PriorityQueue<Pair>();
+		HashMap<Integer,Double> distances = new HashMap<Integer,Double>();
+		HashSet<Integer> visited = new HashSet<Integer>();
+		List<Integer> recommendations = new ArrayList<Integer>();
+		
+		//add root to things
+		distances.put(user_id, 0.0);
+		toVisit.add(new Pair(user_id,0.0));
+		
+		while(!toVisit.isEmpty())
+		{
+			Pair curr = toVisit.poll();
+			visited.add(curr.user_id);
+			
+			if(curr)
+			
+		}
+		
 		
 		return null;
 	}
@@ -135,5 +189,7 @@ public class NetworkAlgorithms {
 		
 		return set;
 	}
+	
+	
 	
 }
