@@ -59,20 +59,29 @@ public class DBWrapper {
 		}
 		
 		int[] friendarray = new int[friendlist.size()];
-		for(int ii = 0; ii < friendarray.length; ii++)
-		{
-			friendarray[ii] = friendlist.get(ii).intValue();
-		}
+
 		
 		return friendarray;
 	}
 	
 	// returns the place_ids of all the places liked by the user with user_id
-	//public int[] getLikes(int user_id);
+	public int[] getLikes(int user_id)
+	{
+		
+	}
 	
 	
 	// returns an array of the form [lat,lon] representing the location
 	// of the place with place_id
 	//public double[] getLocation(int place_id);
+	
+	private int[] convertToPrimitives(ArrayList<Integer> list)
+	{
+		int[] res = new int[list.size()];
+		for(int ii = 0; ii < friendarray.length; ii++)
+		{
+			friendarray[ii] = friendlist.get(ii).intValue();
+		}
+	}
 
 }
