@@ -58,6 +58,37 @@ public class NetworkAlgorithms {
 		}
 		
 	}
+	
+	private class Friend implements Comparable<Friend>
+	{
+		int user_id;
+		double distance;
+		double[] location;
+		
+		public Friend(int ui, double[] loc, double[] youloc)
+		{
+			user_id = ui;
+			location = loc;
+			distance = Math.sqrt(Math.pow((loc[0] - youloc[0]),2) + 
+					Math.pow((loc[1] - youloc[1]),2));
+		}
+		
+		public int compareTo(Friend other)
+		{
+			if (this.distance > other.distance)
+			{
+				return 1;
+			}
+			else if (this.distance < other.distance)
+			{
+				return -1;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+	}
 
 
 	public NetworkAlgorithms(String dbUser, String dbPass, String dbSID, String dbHost, 
@@ -149,7 +180,7 @@ public class NetworkAlgorithms {
 						
 						if (newweight < distances.get(friends[ii]))
 						{
-							//remove from PQ
+							//remove from priority queue
 						}
 						
 					}
@@ -219,6 +250,11 @@ public class NetworkAlgorithms {
 		return set;
 	}
 	
-	
+	public String recommendActivities
+		(int user_id, int maxFriends, int maxPlaces) 
+				throws IllegalArgumentException
+	{
+		return "";
+	}
 	
 }
