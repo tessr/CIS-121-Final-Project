@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import edu.upenn.cis.cis121.db.Student;
 
 /**
  * 
@@ -34,7 +33,6 @@ public class DBWrapper {
 		{
 			e.printStackTrace();
 		}
-		
 	}
 	
 	// returns the user_ids of all friends of the user with the input user_id
@@ -70,9 +68,11 @@ public class DBWrapper {
 	}
 	
 	// returns the place_ids of all the places liked by the user with user_id
-	public int[] getLikes(int user_id);
+	//public int[] getLikes(int user_id);
+	
+	
 	// returns an array of the form [lat,lon] representing the location
 	// of the place with place_id
-	public double[] getLocation(int place_id);
+	//public double[] getLocation(int place_id);
 
 }
