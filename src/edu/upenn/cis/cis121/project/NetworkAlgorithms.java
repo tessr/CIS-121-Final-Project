@@ -126,12 +126,40 @@ public class NetworkAlgorithms {
 		distances.put(user_id, 0.0);
 		toVisit.add(new Pair(user_id,0.0));
 		
-		while(!toVisit.isEmpty())
+		while(!toVisit.isEmpty() && counter <= numRec)
 		{
 			Pair curr = toVisit.poll();
 			visited.add(curr.user_id);
 			
-			if(curr)
+			if(dbw.isFriend(curr.user_id, user_id))
+			{
+				recommendations.add(curr.user_id);
+				counter++;
+			}
+			
+			int[] friends = dbw.getFriends(curr.user_id);
+			for (int ii = 0; ii < friends.length; ii++)
+			{
+				if(visited.add(friends[ii]))
+				{
+					double newweight = weight(friends[ii], curr.user_id) + 
+						distances.get(curr.user_id);
+					if(distances.containsKey(friends[ii]))
+					{
+						
+						if (newweight < distances.get(friends[ii]))
+						{
+							//remove from PQ
+						}
+						
+					}
+					else
+					{
+						toVisit.add(new Pair(friends[ii],newweight));
+						distances.put(friends[ii], newweight);
+					}
+				}
+			}
 			
 		}
 		
@@ -178,6 +206,7 @@ public class NetworkAlgorithms {
 		return weight;
 
 	}
+
 	
 	private HashSet<Integer> fromPrim(int[] arr)
 	{
