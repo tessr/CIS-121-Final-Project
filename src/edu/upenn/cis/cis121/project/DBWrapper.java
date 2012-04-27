@@ -174,6 +174,16 @@ public class DBWrapper {
 		
 	}
 	
+	public boolean isFriend(int user1, int user2)
+	{
+		int[] friends = getFriends(user1);
+		for(int ii = 0; ii < friends.length; ii++)
+		{
+			if(friends[ii] == user2) return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * Converts an ArrayList of Integers to an array of ints.
 	 * @param list ArrayList of Integers
