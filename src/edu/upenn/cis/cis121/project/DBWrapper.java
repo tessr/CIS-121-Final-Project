@@ -87,6 +87,34 @@ public class DBWrapper {
 		
 	}
 	
+	/**
+	 * Get the type_id given a place_id
+	 * @param place_id
+	 * @return the type_id of the place. returns -1 if not found
+	 */
+	
+	public int getType(int place_id)
+	{
+		int ptid = -1;
+		try {
+			String query = "select type_id from Places where place_id=" + 
+					place_id;
+			
+			Statement st = _conn.createStatement();
+		    ResultSet rs = st.executeQuery(query);
+		    
+		    while (rs.next()) {
+		    	ptid = rs.getInt("type_id");
+		    }
+		    
+		    rs.close();
+		    st.close();
+		} catch (SQLException sqle) {
+			System.err.println(sqle.toString());
+		}
+		return ptid;
+	}
+	
 	
 	// returns an array of the form [lat,lon] representing the location
 	// of the place with place_id
