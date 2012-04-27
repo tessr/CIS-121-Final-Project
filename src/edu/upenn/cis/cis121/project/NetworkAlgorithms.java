@@ -180,7 +180,23 @@ public class NetworkAlgorithms {
 						
 						if (newweight < distances.get(friends[ii]))
 						{
-							//remove from priority queue
+							ArrayList<Pair> temp = new ArrayList<Pair>();
+							while(!toVisit.isEmpty())
+							{
+								Pair tempp = toVisit.poll();
+								if (tempp.user_id != friends[ii])
+								{
+									temp.add(tempp);
+								}
+							}
+							
+							for (Pair pp : temp)
+							{
+								toVisit.add(pp);
+							}
+							
+							toVisit.add(new Pair(friends[ii], newweight));
+
 						}
 						
 					}
