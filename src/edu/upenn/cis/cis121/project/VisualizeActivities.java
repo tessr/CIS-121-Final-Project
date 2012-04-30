@@ -42,7 +42,7 @@ public class VisualizeActivities {
 		String SID = "CIS";
 		String host = "fling.seas.upenn.edu";
 		int port = 1521;
-		NetworkAlgorithms toVisualize = new NetworkAlgorithms(user, pass, SID, host, port);
+		NetworkAlgorithms toVisualize = new NetworkAlgorithms(/*parameters*/);
 		
 		// parameters for call to NetworkAlgorithms.recommendActivities()
 		int userID = 197;

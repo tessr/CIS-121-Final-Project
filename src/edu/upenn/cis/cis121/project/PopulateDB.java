@@ -19,7 +19,19 @@ import edu.upenn.cis.cis121.project.DBUtils;
 
 public class PopulateDB {
 	
+	/**
+	 * connect to the server
+	 */
 	private Connection _conn;
+	
+	/**
+	 * Populate the database
+	 * @param dbUser
+	 * @param dbPass
+	 * @param dbSID
+	 * @param dbHost
+	 * @param port
+	 */
 	
 	public PopulateDB(String dbUser, String dbPass, String dbSID,
 			String dbHost, int port)
@@ -38,6 +50,11 @@ public class PopulateDB {
 		}	
 		
 	}
+	
+	/**
+	 * Populate places table from a file
+	 * @param filename
+	 */
 	
 	public void populatePlaces(String filename)
 	{
@@ -86,6 +103,10 @@ public class PopulateDB {
 		}
 		
 	}
+	/**
+	 * populate likes from a file
+	 * @param filename
+	 */
 	
 	public void populateLikes(String filename)
 	{

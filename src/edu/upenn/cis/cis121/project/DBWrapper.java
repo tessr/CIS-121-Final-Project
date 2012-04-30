@@ -8,15 +8,26 @@ import java.util.ArrayList;
 
 
 /**
- * 
+ * A set of functions to connect to the Oracle database.
  * @author Tess Rinearson - tessr@seas.upenn.edu
  *
  */
 
 public class DBWrapper {
 	
+	/**
+	 * Connection to the database, via DBUtils
+	 */
 	private Connection _conn;
-
+	
+	/**
+	 * Constructor.
+	 * @param dbUser
+	 * @param dbPass
+	 * @param dbSID
+	 * @param dbHost
+	 * @param port
+	 */
 	public DBWrapper(String dbUser, String dbPass, String dbSID, String dbHost, 
 			int port)
 	{
@@ -35,7 +46,11 @@ public class DBWrapper {
 		}
 	}
 	
-	// returns the user_ids of all friends of the user with the input user_id
+	/**
+	 * returns the user_ids of all friends of the user with the input user_id
+	 * @param user_id 
+	 * @return int list of all friends
+	 */
 	public int[] getFriends(int user_id)
 	{
 		ArrayList<Integer> friendlist = new ArrayList<Integer>();
@@ -61,7 +76,98 @@ public class DBWrapper {
 		return convertToPrimitives(friendlist);
 	}
 	
-	// returns the place_ids of all the places liked by the user with user_id
+	/**
+	 * Get the first name of a user
+	 * @param user_id
+	 * @return first name
+	 */
+	public String getFirstName(int user_id)
+	{
+		String name = "";
+		try {
+			String query = "select first_name from users where user_id = " + 
+					user_id;
+			
+			Statement st = _conn.createStatement();
+		    ResultSet rs = st.executeQuery(query);
+		    
+		    while (rs.next()) {
+		    	name = rs.getString("first_name");
+		    }
+		    
+		    rs.close();
+		    st.close();
+		} catch (SQLException sqle) {
+			System.err.println(sqle.toString());
+		}
+		
+		return name;
+	}
+	
+	/**
+	 * Get the last name of a user
+	 * @param user_id
+	 * @return first name
+	 */
+	
+	public String getLastName(int user_id)
+	{
+		String name = "";
+		try {
+			String query = "select last_name from users where user_id = " + 
+					user_id;
+			
+			Statement st = _conn.createStatement();
+		    ResultSet rs = st.executeQuery(query);
+		    
+		    while (rs.next()) {
+		    	name = rs.getString("last_name");
+		    }
+		    
+		    rs.close();
+		    st.close();
+		} catch (SQLException sqle) {
+			System.err.println(sqle.toString());
+		}
+		
+		return name;
+	}
+	
+	/**
+	 * Get the name of a place
+	 * @param place_id
+	 * @return the place name
+	 */
+	
+	public String getPlaceName(int place_id)
+	{
+		String name = "";
+		try {
+			String query = "select place_name from places where place_id = " + 
+					place_id;
+			
+			Statement st = _conn.createStatement();
+		    ResultSet rs = st.executeQuery(query);
+		    
+		    while (rs.next()) {
+		    	name = rs.getString("place_name");
+		    }
+		    
+		    rs.close();
+		    st.close();
+		} catch (SQLException sqle) {
+			System.err.println(sqle.toString());
+		}
+		
+		return name;
+	}
+	
+	
+	/**
+	 * returns the place_ids of all the places liked by the user with user_id
+	 * @param user_id
+	 * @return array of place ids
+	 */
 	public int[] getLikes(int user_id)
 	{
 		ArrayList<Integer> likelist = new ArrayList<Integer>();
@@ -115,9 +221,13 @@ public class DBWrapper {
 		return ptid;
 	}
 	
-	
-	// returns an array of the form [lat,lon] representing the location
-	// of the place with place_id
+	/**
+	 * returns an array of the form [lat,lon] representing the location
+	 * of the place with place_id
+	 * @param place_id
+	 * @return lat and long
+	 */
+
 	public double[] getLocation(int place_id)
 	{
 		double[] loc = new double[2];
@@ -142,6 +252,12 @@ public class DBWrapper {
 		return loc;
 	}
 	
+	/**
+	 * Get the location of a user from the db
+	 * @param user_id
+	 * @return location [lat, lon]
+	 */
+	
 	public double[] getUserLocation(int user_id)
 	{
 		double[] loc = new double[2];
@@ -165,6 +281,12 @@ public class DBWrapper {
 		
 		return loc;
 	}
+	
+	/**
+	 * Does this user exist?
+	 * @param user_id
+	 * @return yes or no
+	 */
 	
 	public boolean userExists(int user_id)
 	{
@@ -198,6 +320,12 @@ public class DBWrapper {
 		
 	}
 	
+	/**
+	 * Are two users friends?
+	 * @param user1
+	 * @param user2
+	 * @return yes or no
+	 */
 	public boolean isFriend(int user1, int user2)
 	{
 		int[] friends = getFriends(user1);

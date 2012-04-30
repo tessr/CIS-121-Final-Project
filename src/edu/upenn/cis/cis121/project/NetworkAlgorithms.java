@@ -8,15 +8,42 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+/**
+ * Graph algorithms to traverse the social graph and return recommendations. 
+ * @author Tess Rinearson - tessr@seas.upenn.edu
+ *
+ */
+
 public class NetworkAlgorithms {
 	
+	/**
+	 * Databbase wrapper to handle all db connections. 
+	 */
 	DBWrapper dbw;
+	
+	/**
+	 * Tuple class to help handle pairs for bacon numbers. Ints only.
+	 * @author tessr
+	 *
+	 */
 	
 	private class Tuple {
 		
+		/**
+		 * the User id of a given node
+		 */
 		int user_id;
+		
+		/**
+		 * the depth of that same node
+		 */
 		int depth;
 		
+		/**
+		 * constructor. Takes a user id and a "depth"
+		 * @param ui
+		 * @param ll
+		 */
 		public Tuple(int ui, int ll)
 		{
 			user_id = ui;
@@ -24,21 +51,47 @@ public class NetworkAlgorithms {
 		}
 	}
 	
+	/**
+	 * Pair. Similar to a Tuple (see above), but this time it's comparable and 
+	 * uses an int/double combo instead of int/int. For use in the PriorityQueue
+	 * @author tessr
+	 *
+	 */
 	private class Pair implements Comparable<Pair> {
+		/**
+		 * user_id of this node
+		 */
 		int user_id;
+		
+		/**
+		 * distance from root
+		 */
 		double distance;
 		
+		
+		/**
+		 * constructor
+		 * @param ui
+		 * @param dd
+		 */
 		public Pair(int ui, double dd)
 		{
 			user_id = ui;
 			distance = dd;
 		}
 		
+		/**
+		 * Overrides equals.
+		 */
 		public boolean equals(Object other)
 		{
 			Pair that = (Pair) other;
 			return (this.user_id == that.user_id);
 		}
+		
+		/**
+		 * Implements comparable.
+		 */
 		
 		public int compareTo(Pair other)
 		{
@@ -58,11 +111,37 @@ public class NetworkAlgorithms {
 		
 	}
 	
+	/**
+	 * "Friends" (or users). Contains much of the same info as the Users table.
+	 * @author tessr
+	 *
+	 */
+	
 	private class Friend implements Comparable<Friend>
 	{
+		
+		/**
+		 * user id
+		 */
 		int user_id;
+		
+		/**
+		 * distance from the main user
+		 */
 		double distance;
+		
+		/**
+		 * lat and long
+		 */
 		double[] location;
+		
+		/**
+		 * Constructor. 
+		 * @param ui User ID.
+		 * @param loc Location.
+		 * @param youloc Location of the primary user. Needed for calculating 
+		 * distances/finding closest friends.
+		 */
 		
 		public Friend(int ui, double[] loc, double[] youloc)
 		{
@@ -71,6 +150,10 @@ public class NetworkAlgorithms {
 			distance = Math.sqrt(Math.pow((loc[0] - youloc[0]),2) + 
 					Math.pow((loc[1] - youloc[1]),2));
 		}
+		
+		/**
+		 * Implements comparable.
+		 */
 		
 		public int compareTo(Friend other)
 		{
@@ -91,10 +174,33 @@ public class NetworkAlgorithms {
 	
 	private class Place implements Comparable<Place>
 	{
+		/**
+		 * place id
+		 */
 		int place_id;
+		
+		/**
+		 * distance from the center point
+		 */
+		
 		double distance;
+		
+		/**
+		 * lat and long
+		 */
 		double[] location;
+		
+		/**
+		 * how many people have liked this place?
+		 */
 		double likes;
+		
+		/**
+		 * Constructor. Likes are counted incrementally.
+		 * @param pi
+		 * @param loc
+		 * @param centerloc
+		 */
 		
 		public Place(int pi, double[] loc, double[] centerloc)
 		{
@@ -105,10 +211,19 @@ public class NetworkAlgorithms {
 			likes = 1;
 		}
 		
+		/**
+		 * Get the "suitability" of this place.
+		 * @return
+		 */
+		
 		public double getS()
 		{
 			return likes/(distance + 0.01);
 		}
+		
+		/**
+		 * Implements comparable.
+		 */
 		
 		public int compareTo(Place other)
 		{
@@ -126,6 +241,7 @@ public class NetworkAlgorithms {
 			}
 		}
 		
+		
 		public boolean equals(Object other)
 		{
 			Place that = (Place) other;
@@ -133,13 +249,29 @@ public class NetworkAlgorithms {
 		}
 	}
 
-
+	
+	/**
+	 * Constructor. This data is necessary to open the connection to the
+	 * database.
+	 * @param dbUser
+	 * @param dbPass
+	 * @param dbSID
+	 * @param dbHost
+	 * @param port
+	 */
 	public NetworkAlgorithms(String dbUser, String dbPass, String dbSID, String dbHost, 
 			int port)
 	{
 		dbw = new DBWrapper(dbUser, dbPass, dbSID, dbHost, port);
 	}
 	
+	/**
+	 * Find the Bacon number of two users. 
+	 * @param user_id1
+	 * @param user_id2
+	 * @return the number of edges between 1 and 2
+	 * @throws IllegalArgumentException
+	 */
 	
 	public int distance(int user_id1, int user_id2) 
 			throws IllegalArgumentException
@@ -177,6 +309,8 @@ public class NetworkAlgorithms {
 					{
 						Tuple child = new Tuple(children[ii],child_depth);
 						toExplore.add(child);
+						//feed back in until all nodes are explored.
+						//FIFO means it's BFS not DFS
 					}
 				}
 				
@@ -186,28 +320,38 @@ public class NetworkAlgorithms {
 		return -1;
 		
 	}
-
+	
+	/**
+	 * Given a user id find some number (up to numRec) of friend recommendations
+	 * based on the social graph. 
+	 * @param user_id
+	 * @param numRec
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
+	
 	public List<Integer> recommendFriends(int user_id, int numRec)
 			throws IllegalArgumentException
 	{
-		int counter = 0;
+		int counter = 0; //necessary for numRec
+		
 		PriorityQueue<Pair> toVisit = new PriorityQueue<Pair>();
 		HashMap<Integer,Double> distances = new HashMap<Integer,Double>();
 		HashSet<Integer> visited = new HashSet<Integer>();
 		List<Integer> recommendations = new ArrayList<Integer>();
 		
-		//add root to things
+		//add root to things to start
 		distances.put(user_id, 0.0);
 		toVisit.add(new Pair(user_id,0.0));
 		
 		while(!toVisit.isEmpty() && counter < numRec)
 		{
 			Pair curr = toVisit.poll();
-			visited.add(curr.user_id);
+			visited.add(curr.user_id); //never worry about this node again
 			
 			if(!dbw.isFriend(curr.user_id, user_id) && curr.user_id != user_id)
 			{
-				recommendations.add(curr.user_id);
+				recommendations.add(curr.user_id); //this will be suggested
 				counter++;
 			}
 			
@@ -223,6 +367,7 @@ public class NetworkAlgorithms {
 						
 						if (newweight < distances.get(friends[ii]))
 						{
+							//start a bad hack. sorry. i'm sleepy
 							ArrayList<Pair> temp = new ArrayList<Pair>();
 							while(!toVisit.isEmpty())
 							{
@@ -239,6 +384,7 @@ public class NetworkAlgorithms {
 							}
 							
 							toVisit.add(new Pair(friends[ii], newweight));
+							//end bad hack
 
 						}
 						
@@ -257,6 +403,14 @@ public class NetworkAlgorithms {
 		return recommendations;
 	}
 	
+	/**
+	 * Determine how closely two people are linked based on their likes. A larger
+	 * weight means a tighter connection. 
+	 * @param user1
+	 * @param user2
+	 * @return double - the connection "weight" / ranking
+	 */
+	
 	public double weight(int user1, int user2)
 	{
 		HashSet<Integer> places1 = fromPrim(dbw.getLikes(user1));
@@ -270,12 +424,14 @@ public class NetworkAlgorithms {
 		
 		for(Integer place : places1)
 		{
+			//first check for common places
 			place_types_1.add(dbw.getType(place.intValue()));
 			if(places2.contains(place)) common_places.add(place);
 		}
 		
 		for(Integer place: places2)
 		{
+			//get all place types
 			place_types_2.add(dbw.getType(place.intValue()));
 		}
 		
@@ -283,7 +439,7 @@ public class NetworkAlgorithms {
 		{
 			if(place_types_2.contains(place_type))
 			{
-				common_place_type_count++;
+				common_place_type_count++; //count place types
 				place_types_2.remove(place_type);
 			}
 		}
@@ -298,8 +454,11 @@ public class NetworkAlgorithms {
 
 	}
 	
-
-
+	/**
+	 * Convert a primitive int array into a fancy Integer HashSet.
+	 * @param arr
+	 * @return
+	 */
 	
 	private HashSet<Integer> fromPrim(int[] arr)
 	{
@@ -311,6 +470,15 @@ public class NetworkAlgorithms {
 		
 		return set;
 	}
+	
+	/**
+	 * Recommends activities based on friends and location. 
+	 * @param user_id
+	 * @param maxFriends
+	 * @param maxPlaces
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
 	
 	public String recommendActivities
 		(int user_id, int maxFriends, int maxPlaces) 
@@ -338,6 +506,10 @@ public class NetworkAlgorithms {
 			close_friends.add(all_friends.poll());
 		}
 		
+		//add the user 
+		double[] uloc = dbw.getUserLocation(user_id);
+		close_friends.add(new Friend(user_id,uloc,uloc));
+		
 		//now find the center of friends
 		
 		double tot_long = 0;
@@ -349,17 +521,22 @@ public class NetworkAlgorithms {
 			tot_long += close_friends.get(ii).location[1];
 		}
 		
-		tot_lat += dbw.getUserLocation(user_id)[0];
-		tot_long += dbw.getUserLocation(user_id)[1];
-		
-		double center_lat = tot_lat/(close_friends.size() + 1);
-		double center_long = tot_long/(close_friends.size() + 1);
+		double center_lat = tot_lat/(close_friends.size());
+		double center_long = tot_long/(close_friends.size());
 		double[] center = {center_lat, center_long};
 		
 		//and get a set of all the places that people like
 		
 		PriorityQueue<Place> passable_places = new PriorityQueue<Place>();
 		
+		String jsonstring ="{\"user\":{\"user_id\":" + user_id + 
+				",\"first_name\":\"" + dbw.getFirstName(user_id) +
+				"\",\"last_name\":\""+ dbw.getLastName(user_id) + 
+				"\",\"latitude\":"+ dbw.getUserLocation(user_id)[0] + 
+				",\"longitude\":" + dbw.getUserLocation(user_id)[1] + 
+				"},\"friends\": { "; 
+		
+		int fcount = 0;
 		for(Friend ff : close_friends)
 		{
 			int[] places = dbw.getLikes(ff.user_id);
@@ -377,14 +554,49 @@ public class NetworkAlgorithms {
 					curr.likes++;
 					passable_places.add(curr);
 				}
+				
 			}
+			
+			//put into json
+			
+			jsonstring += "\"" + fcount + "\" : {\"user_id\":" + ff.user_id + 
+					",\"first_name\":\"" + dbw.getFirstName(ff.user_id) + 
+					"\",\"last_name\":\"" + dbw.getLastName(ff.user_id) + 
+					"\",\"latitude\":" + dbw.getUserLocation(ff.user_id)[0] + 
+					",\"longitude\":" + dbw.getUserLocation(ff.user_id)[1] +"},";
+			fcount++;
+			
 		}
 		
-		//need to update so getS is less... zero
+		//remove last character (comma)
 		
+		jsonstring = jsonstring.substring(0,jsonstring.length()-1);
+		jsonstring += "}, \"places\": {";
 		
+		//now all places
 		
-		return "";
+		ArrayList<Place> best = new ArrayList<Place>();
+		
+		for(int ii = 0; ii < maxPlaces; ii++)
+		{
+			best.add(passable_places.poll());
+		}
+		
+		int pcount = 1; 
+		for (Place pp : best)
+		{
+			jsonstring += "\"" + pcount + "\" : {\"place_id\":" + pp.place_id + 
+					",\"place_name\":\"" + dbw.getPlaceName(pp.place_id) + 
+					"\",\"description\":\"" + dbw.getType(pp.place_id) + 
+					"\",\"latitude\":" + dbw.getLocation(pp.place_id)[0] + 
+					",\"longitude\":" + dbw.getLocation(pp.place_id)[0] + 
+					"},";
+			pcount++;
+		}
+		jsonstring = jsonstring.substring(0,jsonstring.length()-1);
+		jsonstring += "} }";
+		System.out.println(jsonstring);
+		return jsonstring;
 	}
 	
 	/**
